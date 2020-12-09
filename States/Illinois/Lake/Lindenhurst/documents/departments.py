@@ -96,26 +96,41 @@ class Departments:
     def getAllReports(self) -> dict:
         responses = {}
         for department in self.departments.keys():
+
+            dateList = []
+            titleList = []
+            typeList = []
+            urlList = []
+
             for url in self.departments[department]:
                 response = requests.get(url).text
                 soup = BeautifulSoup(markup=response, features="lxml")
 
                 titles = soup.findAll(name="td", attrs={"class": "eGov_DataCell3"})
+                # urls = soup.findAll(name="a", attrs={"class": "eGov_listItemLink"})
                 dates = soup.findAll(name="td", attrs={"class": "eGov_listSortDesc"})
                 types = soup.findAll(name="td", attrs={"class": "eGov_DataCell2"})
 
                 for title in titles:
-                    print(title.text)
-                    print(title.get("href"))
+                    titleList.append(title.text.strip().replace("\n", ""))
+                    for url in title.children:
+                        urlList.append(url.get("href"))
 
                 for date in dates:
-                    print(date.text)
+                    dateList.append(date.text.strip().replace("\n", ""))
 
                 for type in types:
-                    for image in type.children:
-                        print(image.get("alt"))
+                    for image in type.children:  # There is only object in this iterator
+                        typeList.append(image.get("alt").strip().replace("\n", ""))
+
+            if len(dateList) == len(titleList) == len(typeList) == len(urlList):
+                for item in range(len(dateList)):
+                    hashCode = dateList[item].replace("/", "") + titleList[item][0:3]
+                    responses[hashCode] = [
+                        dateList[item],
+                        titleList[item],
+                        typeList[item],
+                        urlList[item],
+                    ]
 
         return responses
-
-
-Departments().getAllReports()
