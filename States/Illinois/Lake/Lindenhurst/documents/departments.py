@@ -76,9 +76,6 @@ class Departments:
             except IndexError:
                 lastPage = 1
 
-            print(url)
-            print(lastPage)
-
             if currentPage != lastPage:
                 templateURL = url[: url.index(re.findall("(page\=)([^&]+)", url)[0][1])]
                 for pageNumber in range(lastPage + 1):
@@ -90,10 +87,8 @@ class Departments:
                         )
                 self.storeJSON()
 
-            else:
+            if currentPage >= lastPage:
                 self.completed.add(department)
-
-        print(self.completed)
 
         if len(self.completed) != 8:
             self.getAllPages()
