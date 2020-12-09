@@ -93,5 +93,29 @@ class Departments:
         if len(self.completed) != 8:
             self.getAllPages()
 
+    def getAllReports(self) -> dict:
+        responses = {}
+        for department in self.departments.keys():
+            for url in self.departments[department]:
+                response = requests.get(url).text
+                soup = BeautifulSoup(markup=response, features="lxml")
 
-Departments().getAllPages()
+                titles = soup.findAll(name="td", attrs={"class": "eGov_DataCell3"})
+                dates = soup.findAll(name="td", attrs={"class": "eGov_listSortDesc"})
+                types = soup.findAll(name="td", attrs={"class": "eGov_DataCell2"})
+
+                for title in titles:
+                    print(title.text)
+                    print(title.get("href"))
+
+                for date in dates:
+                    print(date.text)
+
+                for type in types:
+                    for image in type.children:
+                        print(image.get("alt"))
+
+        return responses
+
+
+Departments().getAllReports()
